@@ -4,7 +4,9 @@ import com.knowledge.practice.orderservice.dto.OrderRequest;
 import com.knowledge.practice.orderservice.dto.OrderResponse;
 import com.knowledge.practice.orderservice.model.Order;
 import com.knowledge.practice.orderservice.model.OrderStatus;
+import com.knowledge.practice.orderservice.payment.PaymentService;
 import com.knowledge.practice.orderservice.repository.OrderRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +14,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderServiceImpl  implements  OrderService{
 
     private final OrderRepository orderRepository;
+    private final PaymentService paymentService;
 
     @Override
     public OrderResponse createOrder(OrderRequest orderRequest) {
@@ -23,6 +27,7 @@ public class OrderServiceImpl  implements  OrderService{
                 .status(OrderStatus.CREATED)
                 .build();
         Order savedOrder= orderRepository.save(order);
+        paymentService.processPayment(savedOrder.getPrice());
         return mapToOrderResponse(savedOrder);
     }
 
