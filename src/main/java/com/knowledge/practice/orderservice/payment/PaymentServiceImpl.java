@@ -11,7 +11,7 @@ public class PaymentServiceImpl implements PaymentService{
     public void processPayment(Double price) {
 
         if(new Random().nextBoolean()){
-            throw new PaymentFailedException("Payment failed !");
+            throw new PaymentFailedException("Payment could not be processed !");
         }
         System.out.println("Payment processed successfully for amount: " + price);
     }
