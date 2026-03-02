@@ -1,5 +1,6 @@
 package com.knowledge.practice.orderservice.security.controller;
 
+import com.knowledge.practice.orderservice.security.dto.LoginRequest;
 import com.knowledge.practice.orderservice.security.dto.RegisterRequest;
 import com.knowledge.practice.orderservice.security.service.AuthService;
 import jakarta.validation.Valid;
@@ -20,5 +21,10 @@ public class AuthController {
     public String register(@Valid @RequestBody RegisterRequest registerRequest) {
          authService.register(registerRequest);
          return ("User registered successfully");
+    }
+
+    @PostMapping("/login")
+    public String login(@Valid @RequestBody LoginRequest loginRequest) {
+        return authService.login(loginRequest.getUsername(), loginRequest.getPassword());
     }
 }

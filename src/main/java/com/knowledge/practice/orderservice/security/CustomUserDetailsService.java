@@ -1,24 +1,29 @@
 package com.knowledge.practice.orderservice.security;
 
-import com.knowledge.practice.orderservice.user.model.UserDetails;
 import com.knowledge.practice.orderservice.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public UserDetails loadUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .map(userDetails -> UserDetails.builder()
-                        .username(userDetails.getUsername())
-                        .password(userDetails.getPassword())
-                        .role(userDetails.getRole().replace("ROLE_", ""))
-                        .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    @Override
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+
+        com.knowledge.practice.orderservice.user.model.User user =
+                userRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new UsernameNotFoundException("User not found"));
+
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole().replace("ROLE_", ""))
+                .build();
     }
 }
