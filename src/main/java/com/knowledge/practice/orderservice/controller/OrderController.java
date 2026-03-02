@@ -1,7 +1,10 @@
 package com.knowledge.practice.orderservice.controller;
 
+import com.knowledge.practice.orderservice.dto.OrderRequest;
+import com.knowledge.practice.orderservice.dto.OrderResponse;
 import com.knowledge.practice.orderservice.model.Order;
 import com.knowledge.practice.orderservice.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,17 +18,17 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/create")
-    public Order createOrder(@RequestBody Order order) {
+    public OrderResponse createOrder(@Valid @RequestBody OrderRequest order) {
         return orderService.createOrder(order);
     }
 
     @GetMapping("/{id}")
-    public Order getOrderById(@PathVariable Long id) {
+    public OrderResponse getOrderById(@PathVariable Long id) {
         return orderService.getOrderById(id);
     }
 
     @GetMapping("/")
-    public List<Order> getAllOrders() {
+    public List<OrderResponse> getAllOrders() {
         return orderService.getAllOrders();
     }
 

@@ -1,6 +1,9 @@
 package com.knowledge.practice.orderservice.service;
 
+import com.knowledge.practice.orderservice.dto.OrderRequest;
+import com.knowledge.practice.orderservice.dto.OrderResponse;
 import com.knowledge.practice.orderservice.model.Order;
+import com.knowledge.practice.orderservice.model.OrderStatus;
 import com.knowledge.practice.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,18 +17,36 @@ public class OrderServiceImpl  implements  OrderService{
     private final OrderRepository orderRepository;
 
     @Override
-    public Order createOrder(Order order) {
-        return orderRepository.save(order);
+    public OrderResponse createOrder(OrderRequest orderRequest) {
+        Order order=Order.builder().productName(orderRequest.getProductName())
+                .price(orderRequest.getPrice())
+                .status(OrderStatus.CREATED)
+                .build();
+        Order savedOrder= orderRepository.save(order);
+        return mapToOrderResponse(savedOrder);
     }
 
+
+
     @Override
-    public Order getOrderById(Long id) {
-        return orderRepository.findById(id)
+    public OrderResponse getOrderById(Long id) {
+        Order order= orderRepository.findById(id)
                         .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
+        return mapToOrderResponse(order);
     }
 
     @Override
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<OrderResponse> getAllOrders() {
+        List<Order> orderList= orderRepository.findAll();
+        return orderList.stream().map(order-> mapToOrderResponse(order)).toList();
+    }
+
+    private OrderResponse mapToOrderResponse(Order savedOrder) {
+        return OrderResponse.builder().id(savedOrder.getId())
+                .productName(savedOrder.getProductName())
+                .price(savedOrder.getPrice())
+                .status(savedOrder.getStatus().name())
+                .createdAt(savedOrder.getCreatedAt())
+                .build();
     }
 }
