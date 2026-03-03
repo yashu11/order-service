@@ -4,13 +4,15 @@ import com.knowledge.practice.orderservice.dto.OrderRequest;
 import com.knowledge.practice.orderservice.dto.OrderResponse;
 import com.knowledge.practice.orderservice.model.Order;
 import com.knowledge.practice.orderservice.model.OrderStatus;
-import com.knowledge.practice.orderservice.payment.PaymentService;
 import com.knowledge.practice.orderservice.repository.OrderRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +20,9 @@ import java.util.List;
 public class OrderServiceImpl  implements  OrderService{
 
     private final OrderRepository orderRepository;
-    private final PaymentService paymentService;
+    private final PaymentClientService paymentClientService;
+//    private final PaymentService paymentService;
+//    private final RestTemplate restTemplate;
 
     @Override
     public OrderResponse createOrder(OrderRequest orderRequest) {
@@ -27,9 +31,28 @@ public class OrderServiceImpl  implements  OrderService{
                 .status(OrderStatus.CREATED)
                 .build();
         Order savedOrder= orderRepository.save(order);
-        paymentService.processPayment(savedOrder.getPrice());
+
+        paymentClientService.callPaymentService(savedOrder);
+        if(savedOrder.getStatus() != OrderStatus.PAYMENT_FAILED){
+            savedOrder.setStatus(OrderStatus.COMPLETED);
+        }
+         orderRepository.save(savedOrder);
+
+
+//        try {
+//            String paymentServiceUrl = "http://localhost:8081/api/payments/process";
+//            Map<String, Object> paymentRequest = Map.of("orderId", savedOrder.getId(), "amount", savedOrder.getPrice());
+//            restTemplate.postForEntity(paymentServiceUrl, paymentRequest, Void.class);
+//            savedOrder.setStatus(OrderStatus.COMPLETED);
+//        } catch (Exception e) {
+//            savedOrder.setStatus(OrderStatus.PAYMENT_PENDING);
+//        }
+
+//        paymentService.processPayment(savedOrder.getPrice());
         return mapToOrderResponse(savedOrder);
     }
+
+
 
 
 

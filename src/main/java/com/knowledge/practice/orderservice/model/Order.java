@@ -25,6 +25,7 @@ public class Order {
     private Double price;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 30)
     private OrderStatus status;
 
     private LocalDateTime createdAt;

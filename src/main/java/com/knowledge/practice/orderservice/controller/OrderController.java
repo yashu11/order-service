@@ -6,6 +6,7 @@ import com.knowledge.practice.orderservice.model.Order;
 import com.knowledge.practice.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/create")
     public OrderResponse createOrder(@Valid @RequestBody OrderRequest order) {
         return orderService.createOrder(order);
@@ -27,6 +29,7 @@ public class OrderController {
         return orderService.getOrderById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/")
     public List<OrderResponse> getAllOrders() {
         return orderService.getAllOrders();
