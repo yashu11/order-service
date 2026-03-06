@@ -2,7 +2,6 @@ package com.knowledge.practice.orderservice.controller;
 
 import com.knowledge.practice.orderservice.dto.OrderRequest;
 import com.knowledge.practice.orderservice.dto.OrderResponse;
-import com.knowledge.practice.orderservice.model.Order;
 import com.knowledge.practice.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

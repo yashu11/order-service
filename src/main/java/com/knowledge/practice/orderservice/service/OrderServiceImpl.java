@@ -1,5 +1,6 @@
 package com.knowledge.practice.orderservice.service;
 
+import com.knowledge.practice.orderservice.client.PaymentClient;
 import com.knowledge.practice.orderservice.dto.OrderRequest;
 import com.knowledge.practice.orderservice.dto.OrderResponse;
 import com.knowledge.practice.orderservice.model.Order;
@@ -20,7 +21,9 @@ import java.util.Map;
 public class OrderServiceImpl  implements  OrderService{
 
     private final OrderRepository orderRepository;
-    private final PaymentClientService paymentClientService;
+//    private final  PaymentClientService paymentClientService;
+    private final PaymentClient paymentClient;
+//    private final PaymentClientService paymentClientService;
 //    private final PaymentService paymentService;
 //    private final RestTemplate restTemplate;
 
@@ -32,12 +35,15 @@ public class OrderServiceImpl  implements  OrderService{
                 .build();
         Order savedOrder= orderRepository.save(order);
 
-        paymentClientService.callPaymentService(savedOrder);
-        if(savedOrder.getStatus() != OrderStatus.PAYMENT_FAILED){
+        Map<String, Object> paymentRequest = Map.of("orderId", order.getId(), "amount", order.getPrice());
+        String response= paymentClient.processPayment(paymentRequest);
+        if("FAILED".equals(response)){
+            savedOrder.setStatus(OrderStatus.PAYMENT_FAILED);
+        }
+        else {
             savedOrder.setStatus(OrderStatus.COMPLETED);
         }
          orderRepository.save(savedOrder);
-
 
 //        try {
 //            String paymentServiceUrl = "http://localhost:8081/api/payments/process";
